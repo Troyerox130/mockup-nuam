@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="light" id="htmlRoot">
 <head>
     <meta charset="UTF-8">
     <title>Calificaciones Tributarias</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f6f9; }
-        .btn-toolbar-custom { background-color: #e9ecef; padding: 10px; border-radius: 5px; }
+        .btn-toolbar-custom { padding: 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -15,7 +14,7 @@
         
         <!-- Barra superior de filtros -->
         <div class="card shadow-sm mb-3">
-            <div class="card-body bg-white py-3">
+            <div class="card-body py-3">
                 <form method="GET" action="">
                     <div class="row g-3 align-items-center">
                         <div class="col-md-3">
@@ -79,8 +78,8 @@
             </div>
         </div>
 
-        <!-- Botonera Inferior con Carga x Monto Activa -->
-        <div class="d-flex justify-content-between align-items-center btn-toolbar-custom shadow-sm">
+        <!-- Botonera Inferior -->
+        <div class="d-flex justify-content-between align-items-center btn-toolbar-custom shadow-sm bg-body-tertiary">
             <div>
                 <button type="button" class="btn btn-dark btn-sm px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#modalRegistro">
                     INGRESAR
@@ -100,10 +99,20 @@
                         OPCIONES
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow">
+                        <li><h6 class="dropdown-header text-uppercase small fw-bold">Visualización</h6></li>
+                        <li><a class="dropdown-item small" href="#" onclick="toggleDarkMode(); return false;">Cambiar Modo Oscuro/Claro</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header text-uppercase small fw-bold">Zoom de Interfaz</h6></li>
+                        <li><a class="dropdown-item small" href="#" onclick="setZoom(90); return false;">90%</a></li>
+                        <li><a class="dropdown-item small" href="#" onclick="setZoom(100); return false;">100% (Normal)</a></li>
+                        <li><a class="dropdown-item small" href="#" onclick="setZoom(110); return false;">110%</a></li>
+                        <li><a class="dropdown-item small" href="#" onclick="setZoom(125); return false;">125%</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header text-uppercase small fw-bold">Sistema</h6></li>
                         <li><a class="dropdown-item small" href="/admin/" target="_blank">Panel de Administración</a></li>
                         <li><a class="dropdown-item small" href="{% url 'lista_calificaciones' %}">Actualizar Vista</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><span class="dropdown-item-text text-muted small">Total registros: {{ calificaciones.count }}</span></li>
+                        <li><span class="dropdown-item-text text-muted small">Registros: {{ calificaciones.count }}</span></li>
                     </ul>
                 </div>
             </div>
@@ -116,9 +125,9 @@
             <div class="modal-content">
                 <form method="POST">
                     {% csrf_token %}
-                    <div class="modal-header bg-dark text-white">
+                    <div class="modal-header">
                         <h5 class="modal-title">Ingresar Nueva Calificación Tributaria</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         {% if form.errors %}
@@ -143,9 +152,9 @@
             <div class="modal-content">
                 <form method="POST" action="{% url 'carga_factor' %}">
                     {% csrf_token %}
-                    <div class="modal-header bg-secondary text-white">
+                    <div class="modal-header">
                         <h5 class="modal-title">Carga por Factor Masivo</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
@@ -172,9 +181,9 @@
             <div class="modal-content">
                 <form method="POST" action="{% url 'carga_monto' %}">
                     {% csrf_token %}
-                    <div class="modal-header bg-secondary text-white">
+                    <div class="modal-header">
                         <h5 class="modal-title">Carga por Monto Masivo</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
@@ -196,5 +205,22 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Modo oscuro nativo de Bootstrap 5.3
+        function toggleDarkMode() {
+            const html = document.getElementById('htmlRoot');
+            const currentTheme = html.getAttribute('data-bs-theme');
+            if (currentTheme === 'dark') {
+                html.setAttribute('data-bs-theme', 'light');
+            } else {
+                html.setAttribute('data-bs-theme', 'dark');
+            }
+        }
+
+        // Control de zoom por porcentajes exactos
+        function setZoom(percent) {
+            document.body.style.zoom = percent + '%';
+        }
+    </script>
 </body>
 </html>
