@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calificaciones Tributarias</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f9; }
+        .btn-toolbar-custom { background-color: #e9ecef; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mt-4 px-4">
+        <h3 class="mb-3 text-secondary">Calificaciones Tributarias</h3>
+        
+        <!-- Barra superior de filtros -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-body bg-white py-3">
+                <form method="GET" action="">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold small">Mercado</label>
+                            <input type="text" class="form-control form-control-sm" value="ACCIONES" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold small">Origen</label>
+                            <input type="text" class="form-control form-control-sm" value="CORREDOR" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold small">Periodo Comercial</label>
+                            <input type="number" name="periodo_comercial" class="form-control form-control-sm" value="{{ periodo_buscado }}">
+                        </div>
+                        <div class="col-md-4 text-end pt-4">
+                            <a href="{% url 'lista_calificaciones' %}" class="btn btn-secondary btn-sm px-4">LIMPIAR</a>
+                            <button type="submit" class="btn btn-primary btn-sm px-4">BUSCAR</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabla principal -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-body p-0">
+                <div class="table-responsive" style="min-height: 300px;">
+                    <table class="table table-bordered table-striped table-hover mb-0 align-middle small">
+                        <thead class="table-secondary text-center">
+                            <tr>
+                                <th>Ejercicio</th>
+                                <th>Instrumento</th>
+                                <th>Fecha Pago</th>
+                                <th>Descripción</th>
+                                <th>Secuencia Evento</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in calificaciones %}
+                            <tr>
+                                <td>{{ item.ejercicio }}</td>
+                                <td>{{ item.instrumento }}</td>
+                                <td>{{ item.fecha_pago }}</td>
+                                <td>{{ item.descripcion }}</td>
+                                <td>{{ item.secuencia_evento }}</td>
+                                <td class="text-center">
+                                    <a href="{% url 'editar_calificacion' item.id %}" class="btn btn-warning btn-sm py-0 px-2">Modificar</a>
+                                    <a href="{% url 'copiar_calificacion' item.id %}" class="btn btn-info btn-sm py-0 px-2 text-white">Copiar</a>
+                                    <a href="{% url 'eliminar_calificacion' item.id %}" class="btn btn-danger btn-sm py-0 px-2" onclick="return confirm('¿Eliminar registro?');">Eliminar</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-5">No hay registros que coincidan con la búsqueda.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botonera Inferior con Carga x Monto Activa -->
+        <div class="d-flex justify-content-between align-items-center btn-toolbar-custom shadow-sm">
+            <div>
+                <button type="button" class="btn btn-dark btn-sm px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#modalRegistro">
+                    INGRESAR
+                </button>
+            </div>
+            <div>
+                <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#modalFactor">
+                    CARGA X FACTOR
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#modalMonto">
+                    CARGA X MONTO
+                </button>
+            </div>
+            <div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-dark btn-sm px-4 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        OPCIONES
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                        <li><a class="dropdown-item small" href="/admin/" target="_blank">Panel de Administración</a></li>
+                        <li><a class="dropdown-item small" href="{% url 'lista_calificaciones' %}">Actualizar Vista</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><span class="dropdown-item-text text-muted small">Total registros: {{ calificaciones.count }}</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para INGRESAR -->
+    <div class="modal fade" id="modalRegistro" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title">Ingresar Nueva Calificación Tributaria</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% if form.errors %}
+                            <div class="alert alert-danger">Revisa los datos ingresados.</div>
+                        {% endif %}
+                        <div class="row">
+                            {{ form.as_p }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para CARGA X FACTOR -->
+    <div class="modal fade" id="modalFactor" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="{% url 'carga_factor' %}">
+                    {% csrf_token %}
+                    <div class="modal-header bg-secondary text-white">
+                        <h5 class="modal-title">Carga por Factor Masivo</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Periodo Comercial</label>
+                            <input type="number" name="periodo_factor" class="form-control form-control-sm" value="2025" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Valor del Factor</label>
+                            <input type="number" step="0.0001" name="valor_factor" class="form-control form-control-sm" placeholder="Ej. 1.0500" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Aplicar Carga</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para CARGA X MONTO -->
+    <div class="modal fade" id="modalMonto" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="{% url 'carga_monto' %}">
+                    {% csrf_token %}
+                    <div class="modal-header bg-secondary text-white">
+                        <h5 class="modal-title">Carga por Monto Masivo</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Periodo Comercial</label>
+                            <input type="number" name="periodo_monto" class="form-control form-control-sm" value="2025" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Valor del Monto</label>
+                            <input type="number" step="0.01" name="valor_monto" class="form-control form-control-sm" placeholder="Ej. 50000" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Aplicar Carga</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
