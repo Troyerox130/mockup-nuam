@@ -3,7 +3,9 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.http import require_POST
 from .models import CalificacionTributaria
 from .forms import CalificacionForm, CargaFactorForm, CargaMontoForm
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def lista_calificaciones(request):
     # Toma 2025 por defecto para sincronizar con el selector
     periodo_buscado = request.GET.get('periodo_comercial', '2025')
@@ -42,7 +44,7 @@ def lista_calificaciones(request):
             initial={'periodo_monto': periodo_buscado}
         ),
     })
-
+@login_required
 def editar_calificacion(request, pk):
     calificacion = get_object_or_404(CalificacionTributaria, pk=pk)
     if request.method == 'POST':
@@ -66,6 +68,7 @@ def editar_calificacion(request, pk):
         form = CalificacionForm(instance=calificacion)
     return render(request, 'mantenedor/editar.html', {'form': form})
 
+@login_required
 def copiar_calificacion(request, pk):
     calificacion = get_object_or_404(CalificacionTributaria, pk=pk)
     calificacion.pk = None
@@ -73,11 +76,13 @@ def copiar_calificacion(request, pk):
     calificacion.save()
     return redirect('lista_calificaciones')
 
+@login_required
 def eliminar_calificacion(request, pk):
     calificacion = get_object_or_404(CalificacionTributaria, pk=pk)
     calificacion.delete()
     return redirect('lista_calificaciones')
 
+@login_required
 @require_POST
 def carga_factor(request):
     form = CargaFactorForm(request.POST)
@@ -101,6 +106,7 @@ def carga_factor(request):
         messages.warning(request, f'No hay registros para el período {periodo}.')
     return redirect('lista_calificaciones')
 
+@login_required
 @require_POST
 def carga_monto(request):
     form = CargaMontoForm(request.POST)

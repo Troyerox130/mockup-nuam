@@ -284,6 +284,16 @@
                         <li><h6 class="dropdown-header text-uppercase small fw-bold">Sistema</h6></li>
                         <li><a class="dropdown-item small" href="/admin/" target="_blank">Panel de Administración</a></li>
                         <li><a class="dropdown-item small" href="{% url 'lista_calificaciones' %}">Actualizar Vista</a></li>
+                        
+                        <!-- NUEVA SECCIÓN DE USUARIO Y LOGOUT -->
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header text-uppercase small fw-bold text-primary">👤 Usuario: {{ request.user.username }}</h6></li>
+                        <li>
+                            <form method="POST" action="{% url 'logout' %}" class="d-inline m-0 p-0">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item small text-danger fw-bold">Cerrar Sesión</button>
+                            </form>
+                        </li>
                     </ul>
                 </div>
             </div>
