@@ -1,0 +1,16 @@
+# Entornos virtuales
+venv/
+env/
+ENV/
+
+# Archivos de Python / Django
+__pycache__/
+*.py[cod]
+*$py.class
+db.sqlite3
+media/
+staticfiles/
+
+# IDEs (VS Code)
+.vscode/
+.DS_Store
