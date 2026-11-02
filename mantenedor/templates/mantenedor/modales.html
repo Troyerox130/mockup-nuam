@@ -1,0 +1,166 @@
+<!-- Modal Registro Manual -->
+<div class="modal fade" id="modalRegistro" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content border-0 shadow">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-header bg-white border-bottom">
+                    <h5 class="modal-title text-primary fw-bold">UI_INGRESO_CALIFICACIONES_TRIBUTARIAS</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body bg-light" style="max-height: 70vh; overflow-y: auto;">
+                    {% if form.errors %}
+                        <div class="alert alert-danger">Revisa los datos ingresados.</div>
+                    {% endif %}
+                    
+                    <div class="row g-3 mb-4 pb-3 border-bottom">
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <label class="form-label small fw-bold text-muted mb-0 me-2" style="width: 120px;">Mercado</label>
+                                {{ form.mercado }}
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <label class="form-label small fw-bold text-muted mb-0 me-2" style="width: 120px;">Fecha Pago</label>
+                                {{ form.fecha_pago }}
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <label class="form-label small fw-bold text-muted mb-0 me-2" style="width: 120px;">Sec. Evento</label>
+                                {{ form.secuencia_evento }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <label class="form-label small fw-bold text-muted mb-0 me-2" style="width: 120px;">Instrumento</label>
+                                {{ form.instrumento }}
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <label class="form-label small fw-bold text-muted mb-0 me-2" style="width: 120px;">Periodo</label>
+                                {{ form.periodo_comercial }}
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <label class="form-label small fw-bold text-muted mb-0 me-2" style="width: 120px;">Origen</label>
+                                {{ form.origen }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <label class="form-label small fw-bold text-muted mb-0 me-2" style="width: 120px;">Descripción</label>
+                                {{ form.descripcion }}
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <label class="form-label small fw-bold text-muted mb-0 me-2" style="width: 120px;">Monto</label>
+                                {{ form.monto }}
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <label class="form-label small fw-bold text-muted mb-0 me-2" style="width: 120px;">Acogido ISFUT</label>
+                                {{ form.acogido_isfut }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        {% for field in form %}
+                            {% if field.name not in 'mercado,fecha_pago,secuencia_evento,instrumento,periodo_comercial,origen,descripcion,monto,acogido_isfut' %}
+                                <div class="col-md-4 d-flex flex-column mb-2">
+                                    <label class="form-label small fw-bold text-muted mb-1" style="font-size: 0.7rem;">{{ field.label }}</label>
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="modal-footer bg-white">
+                    <button type="submit" class="btn btn-outline-primary px-5 fw-bold rounded-pill">GRABAR</button>
+                    <button type="button" class="btn btn-outline-secondary px-5 fw-bold rounded-pill" data-bs-dismiss="modal">CANCELAR</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Carga X Factor -->
+<div class="modal fade" id="modalFactor" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content border-0 shadow" style="border-top: 4px solid #ffc107 !important;">
+            <form method="POST" action="{% url 'carga_factor' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header bg-white pb-2 border-bottom">
+                    <h5 class="modal-title text-secondary" style="font-size: 1.1rem;">Cargar Archivo Carga X Factor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0 bg-white">
+                    <div class="px-3 pt-2">
+                        <div class="d-inline-block text-white text-center fw-bold" style="background-color: #2b5a73; padding: 6px 25px; border-radius: 4px 4px 0 0; font-size: 0.85rem;">Archivo</div>
+                    </div>
+                    <div class="table-responsive border-top" style="height: 300px; overflow-y: auto;">
+                        <table class="table table-bordered table-sm mb-0" style="font-size: 0.75rem;">
+                            <thead class="table-light text-muted">
+                                <tr>
+                                    <th class="fw-normal">EJERCICIO</th><th class="fw-normal">MERCADO</th><th class="fw-normal">NEMOTECNICO</th>
+                                    <th class="fw-normal">FEC_PAGO</th><th class="fw-normal">SEC_EVE</th><th class="fw-normal">DESCRIPCION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="previewFactorTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between bg-white py-3">
+                    <div>
+                        <input type="file" name="archivo_excel" id="fileFactorInput" class="d-none" accept=".csv, .xlsx, .xls">
+                        <button type="button" class="btn btn-outline-secondary btn-sm px-3 fw-bold" onclick="document.getElementById('fileFactorInput').click()">Seleccionar Archivo</button>
+                        <span id="fileFactorName" class="small text-muted ms-2">Ningún archivo seleccionado</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn text-white btn-sm px-4 fw-bold" style="background-color: #55879e;">GRABAR</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm px-4 fw-bold" data-bs-dismiss="modal">CANCELAR</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Carga X Monto -->
+<div class="modal fade" id="modalMonto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content border-0 shadow" style="border-top: 4px solid #ffc107 !important;">
+            <form method="POST" action="{% url 'carga_monto' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header bg-white pb-2 border-bottom">
+                    <h5 class="modal-title text-secondary" style="font-size: 1.1rem;">Cargar Archivo Carga X Monto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0 bg-white">
+                    <div class="px-3 pt-2">
+                        <div class="d-inline-block text-white text-center fw-bold" style="background-color: #2b5a73; padding: 6px 25px; border-radius: 4px 4px 0 0; font-size: 0.85rem;">Archivo</div>
+                    </div>
+                    <div class="table-responsive border-top" style="height: 300px; overflow-y: auto;">
+                        <table class="table table-bordered table-sm mb-0" style="font-size: 0.75rem;">
+                            <thead class="table-light text-muted">
+                                <tr>
+                                    <th class="fw-normal">EJERCICIO</th><th class="fw-normal">MERCADO</th><th class="fw-normal">NEMOTECNICO</th>
+                                    <th class="fw-normal">FEC_PAGO</th><th class="fw-normal">SEC_EVE</th><th class="fw-normal">DESCRIPCION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="previewMontoTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between bg-white py-3">
+                    <div>
+                        <input type="file" name="archivo_monto" id="fileMontoInput" class="d-none" accept=".csv">
+                        <button type="button" class="btn btn-outline-secondary btn-sm px-3 fw-bold" onclick="document.getElementById('fileMontoInput').click()">Seleccionar Archivo</button>
+                        <span id="fileMontoName" class="small text-muted ms-2">Ningún archivo seleccionado</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn text-white btn-sm px-4 fw-bold" style="background-color: #55879e;">CALCULAR FACTORES</button>
+                        <button type="submit" class="btn text-white btn-sm px-4 fw-bold" style="background-color: #55879e;">GRABAR</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm px-4 fw-bold" data-bs-dismiss="modal">CANCELAR</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
