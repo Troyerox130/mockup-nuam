@@ -38,12 +38,12 @@
             {% csrf_token %}
             <div class="mb-3">
                 <label for="id_username" class="form-label small fw-bold text-muted">Usuario</label>
-                <input type="text" name="username" autofocus required class="form-control form-control-sm" id="id_username" placeholder="Ingrese su usuario">
+                <input type="text" maxlength="40" name="username" autofocus required class="form-control form-control-sm" id="id_username" placeholder="Ingrese su usuario">
             </div>
 
             <div class="mb-4">
                 <label for="id_password" class="form-label small fw-bold text-muted">Contraseña</label>
-                <input type="password" name="password" required class="form-control form-control-sm" id="id_password" placeholder="••••••••">
+                <input type="password" maxlength="40" name="password" required class="form-control form-control-sm" id="id_password" placeholder="••••••••">
             </div>
 
             <button type="submit" class="btn btn-primary w-100 btn-sm py-2 fw-bold" style="background-color: #2b5a73; border-color: #2b5a73;">

@@ -194,6 +194,46 @@
 
 {% block javascript %}
 <script>
+
+    const fileFactorInput = document.getElementById('fileFactorInput');
+    const fileFactorName = document.getElementById('fileFactorName');
+
+    if (fileFactorInput) {
+        fileFactorInput.addEventListener('change', function() {
+            fileFactorName.textContent = this.files.length > 0
+                ? this.files[0].name
+                : 'Ningún archivo seleccionado';
+        });
+    }
+    // DEPURACIÓN CARGA FACTOR
+const formFactor = document.querySelector('#modalFactor form');
+
+console.log("Input encontrado:", !!fileFactorInput);
+console.log("Formulario encontrado:", !!formFactor);
+
+if (fileFactorInput && formFactor) {
+
+    console.log(
+        "Input pertenece al formulario:",
+        fileFactorInput.form === formFactor
+    );
+
+    formFactor.addEventListener('submit', function(event) {
+
+        const datos = new FormData(this);
+        const archivo = datos.get('archivo_factor');
+
+        console.log("Archivo seleccionado:", fileFactorInput.files[0]);
+        console.log("Archivo incluido en FormData:", archivo);
+        console.log("Contenido enviado:", [...datos.entries()]);
+
+        if (!archivo || !(archivo instanceof File) || archivo.size === 0) {
+            event.preventDefault();
+            alert("No se está adjuntando ningún archivo.");
+        }
+    });
+}
+
     let selectedId = null;
     function seleccionarFila(element) { selectRow(element, Number(element.dataset.id)); }
     function selectRow(element, id) {
@@ -251,6 +291,46 @@
                 myModal.show();
             }
         }
+
+        // Contadores de caracteres del formulario manual
+        const modalRegistro = document.getElementById('modalRegistro');
+
+        if (modalRegistro) {
+
+            const campos = modalRegistro.querySelectorAll(
+                'input[maxlength], textarea[maxlength]'
+            );
+
+            campos.forEach(campo => {
+
+                const maximo = campo.getAttribute('maxlength');
+
+                const contador = document.createElement('small');
+
+                contador.className = 'text-muted text-end';
+                contador.style.fontSize = '11px';
+
+                campo.insertAdjacentElement('afterend', contador);
+
+                function actualizarContador() {
+
+                    const cantidad = campo.value.length;
+
+                    contador.textContent = `${cantidad}/${maximo} caracteres`;
+
+                    if (cantidad >= Number(maximo)) {
+                        contador.className = 'text-danger text-end';
+                    } else {
+                        contador.className = 'text-muted text-end';
+                    }
+                }
+
+                campo.addEventListener('input', actualizarContador);
+
+                actualizarContador();
+    });
+}
+
     });
 </script>
 {% endblock %}
