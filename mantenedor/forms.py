@@ -1,7 +1,88 @@
 from django import forms
 from .models import CalificacionTributaria
+from decimal import Decimal
 
 class CalificacionForm(forms.ModelForm):
+    
+        # Campos de texto
+    mercado = forms.CharField(
+        max_length=2,
+        required=True,
+        error_messages={
+            'required': 'El mercado es obligatorio.',
+            'max_length': 'El mercado permite máximo 2 caracteres.'
+        }
+    )
+
+    ejercicio = forms.RegexField(
+        regex=r'^\d{4}$',
+        max_length=4,
+        required=True,
+        error_messages={
+            'required': 'El ejercicio es obligatorio.',
+            'invalid': 'El ejercicio debe contener exactamente 4 dígitos.'
+        }
+    )
+
+    instrumento = forms.CharField(
+        max_length=40,
+        required=True
+    )
+
+    descripcion = forms.CharField(
+        max_length=50,
+        required=True
+    )
+
+    secuencia_evento = forms.RegexField(
+        regex=r'^\d{1,10}$',
+        max_length=10,
+        required=True,
+        error_messages={
+            'required': 'La secuencia de evento es obligatoria.',
+            'invalid': 'La secuencia debe contener máximo 10 dígitos.'
+        }
+    )
+
+    # Periodo comercial
+    periodo_comercial = forms.IntegerField(
+        min_value=1,
+        required=True,
+        error_messages={
+            'min_value': 'El periodo comercial debe ser mayor que cero.'
+        }
+    )
+
+    # Monto
+    monto = forms.DecimalField(
+        max_digits=18,
+        decimal_places=2,
+        required=True,
+        widget=forms.NumberInput(attrs={
+            'step': '0.01'
+        }),
+        error_messages={
+            'required': 'El monto es obligatorio.'
+        }
+    )
+
+    # Factor de actualización
+    factor_actualizacion = forms.DecimalField(
+        max_digits=20,
+        decimal_places=8,
+        min_value=Decimal('0'),
+        required=True,
+        widget=forms.NumberInput(attrs={
+            'step': '0.00000001',
+            'min': '0'
+        }),
+        error_messages={
+            'required': 'El factor de actualización es obligatorio.',
+            'min_value': 'El factor no puede ser negativo.'
+        }
+    )
+
+    
     class Meta:
         model = CalificacionTributaria
         fields = '__all__'
@@ -12,6 +93,35 @@ class CalificacionForm(forms.ModelForm):
         # 1. Asignar clases de Bootstrap a todos los campos
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control form-control-sm'
+            
+        # Restricciones para los factores 08 hasta 37
+        for i in range(8, 38):
+
+            nombre = f'factor_{i:02d}'
+
+            campo = self.fields[nombre]
+
+            # Campo obligatorio
+            campo.required = False
+
+            # Valores permitidos
+            campo.min_value = Decimal('0')
+            campo.max_value = Decimal('1')
+
+            # Restricciones visuales HTML
+            campo.widget.attrs.update({
+                'type': 'number',
+                'min': '0',
+                'max': '1',
+                'step': '0.00000001',
+                'placeholder': '0.00000000'
+            })
+
+            campo.error_messages.update({
+                'required': 'Este factor es obligatorio.',
+                'min_value': 'El factor no puede ser negativo.',
+                'max_value': 'El factor no puede superar 1.'
+            })
 
         # Asignar clase de checkbox solo a 'acogido_isfut'
         if 'acogido_isfut' in self.fields:

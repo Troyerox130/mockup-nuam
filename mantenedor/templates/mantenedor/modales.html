@@ -5,13 +5,30 @@
             <form method="POST">
                 {% csrf_token %}
                 <div class="modal-header bg-white border-bottom">
-                    <h5 class="modal-title text-primary fw-bold">UI_INGRESO_CALIFICACIONES_TRIBUTARIAS</h5>
+                    <h5 class="modal-title text-primary fw-bold">INGRESO MANUAL DE CALIFICACIONES TRIBUTARIAS</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 
                 <div class="modal-body bg-light" style="max-height: 70vh; overflow-y: auto;">
                     {% if form.errors %}
-                        <div class="alert alert-danger">Revisa los datos ingresados.</div>
+                        <div class="alert alert-danger">
+                            <strong>Se encontraron errores en el formulario:</strong>
+
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>
+                                            <strong>{{ field.label }}:</strong>
+                                            {{ error }}
+                                        </li>
+                                    {% endfor %}
+                                {% endfor %}
+
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     {% endif %}
                     
                     <div class="row g-3 mb-4 pb-3 border-bottom">
@@ -56,6 +73,21 @@
                                 <label class="form-label small fw-bold text-muted mb-0 me-2" style="width: 120px;">Acogido ISFUT</label>
                                 {{ form.acogido_isfut }}
                             </div>
+                            <div class="form-check mt-2">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    id="ingreso_por_montos"
+                                    name="ingreso_por_montos"
+                                    value="1"
+                                    {% if ingreso_por_montos %}checked{% endif %}
+                                >
+
+                                <label class="form-check-label" for="ingreso_por_montos">
+                                    Ingreso por montos
+                                </label>
+                            </div>
+                            
                         </div>
                     </div>
 
@@ -72,8 +104,21 @@
                 </div>
                 
                 <div class="modal-footer bg-white">
-                    <button type="submit" class="btn btn-outline-primary px-5 fw-bold rounded-pill">GRABAR</button>
-                    <button type="button" class="btn btn-outline-secondary px-5 fw-bold rounded-pill" data-bs-dismiss="modal">CANCELAR</button>
+                    <button type="submit" name="accion" value="calcular"
+                            class="btn btn-outline-success px-5 fw-bold rounded-pill">
+                        CALCULAR
+                    </button>
+
+                    <button type="submit" name="accion" value="grabar"
+                            class="btn btn-outline-primary px-5 fw-bold rounded-pill">
+                        GRABAR
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-outline-secondary px-5 fw-bold rounded-pill"
+                            data-bs-dismiss="modal">
+                        CANCELAR
+                    </button>
                 </div>
             </form>
         </div>
@@ -108,13 +153,14 @@
                 </div>
                 <div class="modal-footer d-flex justify-content-between bg-white py-3">
                     <div>
-                        <input type="file" name="archivo_excel" id="fileFactorInput" class="d-none" accept=".csv, .xlsx, .xls">
+                        <input type="file" name="archivo_factor" id="fileFactorInput" class="d-none" accept=".csv, .xlsx, .xls">
                         <button type="button" class="btn btn-outline-secondary btn-sm px-3 fw-bold" onclick="document.getElementById('fileFactorInput').click()">Seleccionar Archivo</button>
                         <span id="fileFactorName" class="small text-muted ms-2">Ningún archivo seleccionado</span>
                     </div>
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn text-white btn-sm px-4 fw-bold" style="background-color: #55879e;">GRABAR</button>
                         <button type="button" class="btn btn-outline-secondary btn-sm px-4 fw-bold" data-bs-dismiss="modal">CANCELAR</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm px-4 fw-bold" data-bs-dismiss="modal">VER FORMATO</button>
                     </div>
                 </div>
             </form>
@@ -164,3 +210,70 @@
         </div>
     </div>
 </div>
+
+{% if mostrar_modal %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modalElemento = document.getElementById('modalRegistro');
+
+        const modal = new bootstrap.Modal(modalElemento);
+
+        modal.show();
+    });
+</script>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const checkboxMontos = document.getElementById('ingreso_por_montos');
+
+    // Factores desde el 08 hasta el 37
+    const nombresFactores = [];
+
+    for (let i = 8; i <= 37; i++) {
+        nombresFactores.push(`factor_${String(i).padStart(2, '0')}`);
+    }
+
+    function actualizarRestricciones() {
+
+        const modoMontos = checkboxMontos.checked;
+
+        nombresFactores.forEach(nombre => {
+
+            const campo = document.querySelector(`[name="${nombre}"]`);
+
+            if (!campo) return;
+
+            // Guardar la restricción original
+            if (campo.dataset.restriccionGuardada !== 'true') {
+                campo.dataset.maxOriginal = campo.getAttribute('max') || '';
+                campo.dataset.restriccionGuardada = 'true';
+            }
+
+            if (modoMontos) {
+
+                // Permitir montos superiores a 1
+                campo.removeAttribute('max');
+
+            } else {
+
+                // Recuperar la restricción normal
+                if (campo.dataset.maxOriginal !== '') {
+                    campo.setAttribute('max', campo.dataset.maxOriginal);
+                }
+            }
+        });
+    }
+
+    // Detectar cambios en el checkbox
+    checkboxMontos.addEventListener('change', actualizarRestricciones);
+
+    // Aplicar restricciones al cargar la página
+    actualizarRestricciones();
+
+});
+</script>
+
+
+
