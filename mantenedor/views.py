@@ -333,6 +333,16 @@ def lista_calificaciones(request):
     mercado = request.GET.get('mercado')
     origen = request.GET.get('origen')
     periodo_comercial = request.GET.get('periodo_comercial')
+    
+    #
+    # Obtener los periodos comerciales existentes en la base de datos
+    periodos_disponibles = (
+        CalificacionTributaria.objects
+        .order_by()
+        .values_list('periodo_comercial', flat=True)
+        .distinct()
+        .order_by('-periodo_comercial')
+    )
 
     if mercado:
         calificaciones = calificaciones.filter(mercado=mercado)
@@ -359,6 +369,9 @@ def lista_calificaciones(request):
         'query_params': query_params.urlencode(),  # Enviamos la URL de filtros armadita
         'mostrar_modal': mostrar_modal,
         'ingreso_por_montos': ingreso_por_montos,
+        'periodos_disponibles': periodos_disponibles,
+        'mercado_buscado': mercado,
+        
     }
     return render(request, 'mantenedor/lista.html', contexto)
 
