@@ -2,7 +2,8 @@
 venv/
 env/
 ENV/
-
+.env
+.env.*
 # Archivos de Python / Django
 __pycache__/
 *.py[cod]
@@ -14,3 +15,8 @@ staticfiles/
 # IDEs (VS Code)
 .vscode/
 .DS_Store
+
+# Permitir plantilla de ejemplo
+!.env.example
+# Archivos estáticos recopilados
+staticfiles/
