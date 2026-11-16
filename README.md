@@ -45,6 +45,12 @@ El sistema está preparado para entornos de alta disponibilidad, implementando u
 * **Hosting PaaS:** Render
 * **Gestión de Estáticos:** Whitenoise
 
+### Otras Dependencias
+* pip install gunicorn
+* https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
+* python -m pip install "psycopg[binary]"
+* python -m pip install dj-database-url python-dotenv
+
 ---
 
 ## ⚙️ Instrucciones de Despliegue Local
