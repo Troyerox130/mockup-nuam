@@ -47,13 +47,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    # Dependencias 2FA
+    # 1. TU APP DEBE IR PRIMERO para que Django use tus plantillas
+    'mantenedor',
+    
+    # 2. Aplicaciones de 2FA DEBAJO
     'django_otp',
     'django_otp.plugins.otp_static',
     'django_otp.plugins.otp_totp',
     'two_factor',
-    
-    'mantenedor'
 ]
 
 MIDDLEWARE = [
